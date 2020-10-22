@@ -2,7 +2,7 @@
 
 TESTSIGMA_USER_NAME=renju.jose@testsigma.com
 TESTSIGMA_PASSWORD=testsigma123
-TESTSIGMA_TEST_PLAN_RUN_URL=https://app.testsigma.com/rest/execution/2438/run
+TESTSIGMA_TEST_PLAN_RUN_URL=https://app.testsigma.com/rest/execution/2090/run
 MAX_WAIT_TIME_FOR_SCRIPT_TO_EXIT=180
 #********END USER_INPUTS***********
 
@@ -20,9 +20,8 @@ get_status(){
     EXECUTION_STATUS=$(echo $RUN_BODY | getJsonValue status)
 
     echo "Execution Status: $EXECUTION_STATUS"
-
-
 }
+
 function checkTestPlanRunStatus(){
   IS_TEST_RUN_COMPLETED=0
   for((i=0; i<= NO_OF_POLLS;i++))
@@ -39,9 +38,8 @@ function checkTestPlanRunStatus(){
       break
     fi
   done
-
-
 }
+
 function saveFinalResponseToAFile(){
   if [ $IS_TEST_RUN_COMPLETED -eq 0 ]
      then
@@ -59,12 +57,6 @@ function getJsonValue() {
 json_key=$1
 awk -F"[,:}]" '{for(i=1;i<=NF;i++){if($i~/\042'$json_key'\042/){print $(i+1)}}}' | tr -d '"'
 }
-
-function exitcode(){
-
-}
-
-
 
 echo "************Testsigma:Start executing automated tests ... ************"
 
