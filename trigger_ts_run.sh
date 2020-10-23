@@ -17,7 +17,7 @@
 TESTSIGMA_API_KEY=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYWQ3NjUxYy0zNzkwLTQ3ZWMtOTkxNC0xMjdlMDM0MTEyM2QiLCJkb21haW4iOiJ0ZXN0c2lnbWEuY29tIn0.5PsU_F4jTipqncDc0MyZbEA3mKflqkrvRGe06A6BbdaOwEz1wHExGR_mmn41FBjQygXVgLGv6RqZIVLTNpgv0w
 TESTSIGMA_TEST_PLAN_ID=2090
 MAX_WAIT_TIME_FOR_SCRIPT_TO_EXIT=60
-JUNIT_REPORT_FILE_PATH=./junit-report$(date +"%Y%m%d%H%M").xml
+JUNIT_REPORT_FILE_PATH=./junit-report-$(date +"%Y%m%d%H%M").xml
 RUNTIME_DATA_INPUT="url=https://the-internet.herokuapp.com/login,test=1221"
 BUILD_NO=$(date +"%Y%m%d%H%M")
 #********END USER_INPUTS***********
@@ -192,6 +192,17 @@ function convertsecs(){
   ((s=${1}%60))
   printf "%02d hours %02d minutes %02d seconds" $h $m $s
 }
+
+function setExitCode(){
+  RESULT=$(echo $RUN_BODY | getJsonValue result)
+  echo $RESULT
+  echo $([[ $RESULT =~ "SUCCESS" ]])
+  if [[ $RESULT =~ "SUCCESS" ]];then
+    EXITCODE=0
+  else
+    EXITCODE=1
+  fi
+}
 #******************************************************
 
 echo "************ Testsigma: Start executing automated tests ************"
@@ -222,18 +233,22 @@ else
   echo "$RUN_ID"
 fi
 
+EXITCODE=0
 # example using the status
 if [ ! $HTTP_STATUS -eq 200  ]; then
   echo "Failed to start Test Plan execution!"
   echo "$HTTP_RESPONSE"
-  exit 1 #Exit with a failure.
+  EXITCODE=1
+  #Exit with a failure.
 else
   echo "Number of maximum polls to be done: $NO_OF_POLLS"
   checkTestPlanRunStatus
   saveFinalResponseToJUnitFile
   saveFinalResponseToJSONFile
+  setExitCode
 fi
 
 echo "************************************************"
 echo "Result JSON Response: $RUN_BODY"
 echo "************ Testsigma: Completed executing automated tests ************"
+exit $EXITCODE
